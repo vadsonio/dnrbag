@@ -1,0 +1,49 @@
+// Small devices (other)
+@mixin sm {
+  @media (max-width: #{$screen-sm-min}) {
+    @content
+  }
+}
+
+// Medium devices (768px)
+@mixin md{
+  @media (max-width: #{$screen-md-min}) {
+    @content
+  }
+}
+
+// Large devices (992px)
+@mixin lg {
+  @media (max-width: #{$screen-lg-min}){
+    @content
+  }
+}
+
+// Extra large devices (1170px)
+@mixin xl {
+  @media (max-width: #{$screen-xl-min}){
+    @content
+  }
+}
+
+
+// Custom devices
+@mixin rwd($screen) {
+  @media (max-width: $screen+'px'){
+    @content
+  }
+}
+
+
+//absolute center
+@mixin absCenter{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+//shadow
+@mixin blockShadow{
+  box-shadow: 0px 0px 5px rgba(0,0,0,.2);
+}

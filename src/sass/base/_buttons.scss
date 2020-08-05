@@ -1,0 +1,25 @@
+.button{
+  padding: 5px 10px;
+  display: inline-block;
+  border: none;
+  border-radius: 4px;
+  transition: .3s;
+  color: #fff;
+  background: $linkColor;
+  &:hover{
+    color: #fff!important;
+    background: darken($linkColor, 10%);
+  }
+  &:focus{
+    color: #fff!important;
+    background: darken($linkColor, 10%);
+  }
+  &--transparent{
+    border: 2px solid $linkColor;
+    color: $linkColor;
+    background: #fff;
+    &:hover{
+      background: $linkColor;
+    }
+  }
+}
