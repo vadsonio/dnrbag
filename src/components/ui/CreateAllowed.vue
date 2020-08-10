@@ -122,7 +122,7 @@
             <div class="create-adv__body-status-icon">
               <font-awesome-icon class="placeholder-icon init-color" :icon="['far', 'flag']" />
             </div>
-            <input type="text" v-model="campaignCountry" placeholder="Страна" @input="campaignCountryKeypress">
+            <input type="text" v-model="campaignCountry" placeholder="Страна" @input="campaignCountryKeypress" :class="{'validation-success': countryCityValidation}">
             <div class="input-popup" v-if="campaignCountryPopup">
               <ul class="input-popup__list">
                 <li
@@ -167,6 +167,7 @@
           <div class="create-adv__body-input district" v-if="showDistrictField">
             <input type="text" v-model="campaignDistrict" placeholder="Район">
           </div>
+
         </div>
 
         <div class="create-adv__body-slot">
@@ -264,6 +265,9 @@
           // campaignPictures: this.$refs.myFiles.files,
           campaignPictures: this.imagesGallery.files,
           campaignDescription: this.campaignDescription,
+          campaignCountry: this.campaignCountry,
+          campaignCity: this.campaignCity,
+          campaignDistrict: this.campaignDistrict,
           campaignPrice: this.campaignPrice,
           campaignId: this.getCampaignId,
           userId: this.loggedUser.uniqueId,
@@ -452,6 +456,16 @@
         }else{
           return false
         }
+      },
+      countryCityValidation(){
+        if(this.campaignCountry.length>0 &&
+          this.campaignCity.length>0 &&
+          this.campaignDistrict.length>0){
+          return true;
+        }else{
+          return false;
+        }
+
       }
     },
     watch: {

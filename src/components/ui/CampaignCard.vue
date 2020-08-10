@@ -8,7 +8,7 @@
         {{imagesQuantity}}
       </div>
       <ul v-if="imagesDots" class="campaign-card__dots">
-        <li class="campaign-card__dot-item" :class="imgActive == index ? 'active' : ''" v-for="(dots, index) in images" :key="index" @click="nextImg(index)"></li>
+        <li class="campaign-card__dot-item" :class="imgActive == index ? 'active' : ''" v-for="(dots, index) in images" :key="index" @mouseover="nextImg(index)"></li>
       </ul>
       <router-link :to="{ path: `/campaignInfo?campaignId=${campaignProps._id}`}">
         <h2 class="campaign-card__title">
@@ -23,6 +23,10 @@
         <time class="campaign-card__time">
           Добавлено: {{campaignProps.campaignDate | dateFormatter}}
         </time>
+        <p class="campaign-card__place">
+          {{campaignProps.campaignCountry}}, {{campaignProps.campaignCity}}
+        </p>
+
       </router-link>
 
       <!--{{campaignProps}}-->
@@ -216,6 +220,12 @@
   &__time {
     font-size: 12px;
     color: #888;
+  }
+  &__place{
+    margin: 0;
+    font-size: 11px;
+    font-weight: 600;
+    color: #000000;
   }
 }
 </style>

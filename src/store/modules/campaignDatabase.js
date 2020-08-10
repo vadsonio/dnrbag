@@ -10,6 +10,9 @@ export default{
         data.append('userId', payload.userId);
         data.append('campaignTitle', payload.campaignTitle);
         data.append('campaignDescription', payload.campaignDescription);
+        data.append('campaignCountry', payload.campaignCountry);
+        data.append('campaignCity', payload.campaignCity);
+        data.append('campaignDistrict', payload.campaignDistrict);
         data.append('campaignPrice', payload.campaignPrice);
         data.append('campaignId', payload.campaignId);
         data.append('campaignCategory', payload.campaignCategory);
