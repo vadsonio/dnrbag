@@ -18,7 +18,10 @@
           {{campaignProps.campaignDescription}}
         </p>
         <p class="campaign-card__price">
-          {{campaignProps.campaignPrice | priceFormatter}}
+          {{priceFormatter(campaignProps.campaignPrice, campaignProps.campaignCurrency)}}
+          <span class="currency">
+            {{currencyFormatter(campaignProps.campaignCurrency)}}
+          </span>
         </p>
         <time class="campaign-card__time">
           Добавлено: {{campaignProps.campaignDate | dateFormatter}}
@@ -26,9 +29,7 @@
         <p class="campaign-card__place">
           {{campaignProps.campaignCountry}}, {{campaignProps.campaignCity}}
         </p>
-
       </router-link>
-
       <!--{{campaignProps}}-->
     </div>
   </div>
@@ -62,6 +63,40 @@
       },
       nextImg(imgIndex){
         this.imgActive = imgIndex;
+      },
+      priceFormatter(price, currency){
+
+        let currencySymbol;
+
+        switch (currency) {
+          case "ruble":
+            currencySymbol = '₽';
+            break;
+          case "hryvna":
+            currencySymbol = '₴';
+            break;
+          case "dollar":
+            currencySymbol = '$';
+            break;
+          default:
+            return ''
+        }
+
+        let formatter = new Intl.NumberFormat('ru-RU', { minimumFractionDigits: 2 });
+
+        return formatter.format(price)+' '+currencySymbol;
+      },
+      currencyFormatter(currency){
+        switch (currency) {
+          case "ruble":
+            return '(RUS рубль)';
+          case "hryvna":
+            return '(UKR гривна)';
+          case "dollar":
+            return '(USA доллар)';
+          default:
+            return ''
+        }
       }
     },
     computed:{
@@ -79,16 +114,6 @@
       this.activeImg();
     },
     filters:{
-      priceFormatter(value){
-        if (!value) return ''
-
-        let formatter = new Intl.NumberFormat('ru-RU', {
-          style: 'currency',
-          currency: 'RUB',
-        });
-
-        return formatter.format(value);
-      },
       dateFormatter(value){
         if(!value) return ''
 
@@ -108,10 +133,8 @@
         let td = currentDate.getDate()+'.'+currentMonth+'.'+currentDate.getFullYear();
 
         if(td == splittedDate){
-          // console.log('ident');
           return `Сегодня ${splittedTime}`;
         } else{
-          // console.log('not ident');
           return `${splittedDate} ${splittedTime}`;
         }
 
@@ -210,12 +233,19 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: pre-line;
   }
   &__price {
     margin-top: 0;
     font-size: 16px;
     font-weight: 700;
     color: #000;
+    .currency{
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: #333;
+    }
   }
   &__time {
     font-size: 12px;

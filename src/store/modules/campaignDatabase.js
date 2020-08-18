@@ -14,6 +14,7 @@ export default{
         data.append('campaignCity', payload.campaignCity);
         data.append('campaignDistrict', payload.campaignDistrict);
         data.append('campaignPrice', payload.campaignPrice);
+        data.append('campaignCurrency', payload.campaignCurrency);
         data.append('campaignId', payload.campaignId);
         data.append('campaignCategory', payload.campaignCategory);
         data.append('campaignPhone', payload.campaignPhone);

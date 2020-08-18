@@ -40,7 +40,7 @@
                 <p class="create-adv__body-err-notice max-length" v-if="campaignTitleValidation">Поле не должно быть пустым</p>
                 <p class="create-adv__body-success" v-if="campaignTitleValidationSuccess">Отлично!</p>
               </div>
-            </div>
+          </div>
         </div>
         <div class="create-adv__body-slot">
           <h2 class="create-adv__subtitle">
@@ -122,7 +122,12 @@
             <div class="create-adv__body-status-icon">
               <font-awesome-icon class="placeholder-icon init-color" :icon="['far', 'flag']" />
             </div>
-            <input type="text" v-model="campaignCountry" placeholder="Страна" @input="campaignCountryKeypress" :class="{'validation-success': countryCityValidation}">
+            <input
+                    type="text"
+                    v-model="campaignCountry"
+                    placeholder="Страна"
+                    @input="campaignCountryKeypress"
+                    :class="{'validation-success': countryCityValidation}">
             <div class="input-popup" v-if="campaignCountryPopup">
               <ul class="input-popup__list">
                 <li
@@ -146,7 +151,8 @@
                     type="text"
                     v-model.trim="campaignCity"
                     placeholder="Город/Населенный пункт"
-                    @input="campaignCityKeypress">
+                    @input="campaignCityKeypress"
+                    :class="{'validation-success': countryCityValidation}">
             <div class="input-popup" v-if="campaignCityPopup">
               <ul class="input-popup__list">
                 <li
@@ -165,7 +171,7 @@
           </div>
 
           <div class="create-adv__body-input district" v-if="showDistrictField">
-            <input type="text" v-model="campaignDistrict" placeholder="Район">
+            <input type="text" v-model="campaignDistrict" placeholder="Район" :class="{'validation-success': countryCityValidation}">
           </div>
 
         </div>
@@ -174,21 +180,76 @@
           <h2 class="create-adv__subtitle">
             5. Выберите категорию
           </h2>
-          <v-select v-model="campaignCategory" :options="options" placeholder="Подходящая категория..."></v-select>
+          <v-select
+                  v-model="campaignCategory"
+                  :options="options"
+                  placeholder="Например: Животные"
+                  :class="{'validation-success': categoryValidation}"></v-select>
+          <!--:class="{'validation-success': categoryValidation}"-->
         </div>
 
         <div class="create-adv__body-slot">
           <h2 class="create-adv__subtitle">
             5. Добавьте цену
           </h2>
-          <input v-model="campaignPrice" type="text" name="price">
+          <!--<input v-model="campaignPrice" type="text" name="price">-->
+
+          <div class="create-adv__body-flex-wrap price">
+            <div class="create-adv__body-input price">
+              <input
+                      type="text"
+                      name="price"
+                      v-model.trim="campaignPrice"
+                      placeholder="1000"
+                      autocomplete="off">
+            </div>
+            <div class="create-adv__body-currency">
+              <div class="currency__stage">
+                <div class="currency__item" @click="changeCampaignCurrency">
+                  <div class="currency__icon">
+                    {{campaignCurrency.items[campaignCurrency.currentId].symbol}}
+                  </div>
+                  <p class="currency__description">
+                    {{campaignCurrency.items[campaignCurrency.currentId].description}}
+                  </p>
+                </div>
+
+                <div class="currency__change-btn"> </div>
+
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
         <div class="create-adv__body-slot">
           <h2 class="create-adv__subtitle">
             6. Добавьте телефонный номер для связи
           </h2>
-          <input v-model="campaignPhone" type="text" name="phone">
+          <div class="create-adv__body-flex-wrap phone">
+            <div class="create-adv__body-input phone">
+              <div class="create-adv__body-status-icon">
+                <font-awesome-icon class="placeholder-icon init-color" :icon="['fas', 'phone-alt']" />
+              </div>
+              <input v-model="campaignPhone" ref="campaignPhone" type="text" name="phone" autocomplete="off">
+            </div>
+            <div class="create-adv__body-phone-country">
+              <div class="phone-country__stage">
+                <div class="phone-country__item" @click="changeCampaignPhoneCode">
+                  <div
+                          class="phone-country__flag"
+                          :style="{backgroundImage: 'url('+require('../../assets/phoneCodesFlags/'+phoneCodes.items[phoneCodes.currentCode].country+'.jpg')+')'}"></div>
+                </div>
+
+                <div class="phone-country__change-btn"></div>
+
+              </div>
+            </div>
+
+          </div>
+
+
         </div>
 
         <button class="button" @click="submitCampaign">Создать</button>
@@ -218,9 +279,11 @@
   // icons
   import { library } from '@fortawesome/fontawesome-svg-core';
   import { faKeyboard, faFlag } from '@fortawesome/free-regular-svg-icons';
-  import { faCheck, faExclamationTriangle, faPlus, faTrashAlt, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
-  library.add(faCheck, faKeyboard, faExclamationTriangle, faPlus, faTrashAlt, faMapMarkerAlt, faFlag);
+  import { faCheck, faExclamationTriangle, faPlus, faTrashAlt, faMapMarkerAlt, faPhoneAlt } from '@fortawesome/free-solid-svg-icons';
+  library.add(faCheck, faKeyboard, faExclamationTriangle, faPlus, faTrashAlt, faMapMarkerAlt, faFlag, faPhoneAlt);
 
+  // phone mask
+  import Inputmask from "inputmask";
 
   export default {
     data(){
@@ -231,6 +294,19 @@
         campaignPrice: '',
         campaignCategory: '',
         campaignPhone: '',
+        phoneCodes: {
+          currentCode: 0,
+          items: [
+            {
+              country: 'UA',
+              code: '+38'
+            },
+            {
+              country: 'RU',
+              code: '+7'
+            }
+          ]
+        },
         options: [
           'Недвижимость',
           'Транспорт',
@@ -254,7 +330,27 @@
         campaignCountryPopup: false,
         campaignCityPopup: false,
         popupListItemIndex: 0,
-        popupListItemIndexMax: 0
+        popupListItemIndexMax: 0,
+        campaignCurrency: {
+          currentId: 0,
+          items: [
+            {
+              symbol: '₽',
+              description: 'Российский рубль',
+              short: 'ruble'
+            },
+            {
+              symbol: '₴',
+              description: 'Украинская гривна',
+              short: 'hryvna'
+            },
+            {
+              symbol: '$',
+              description: 'Американский доллар',
+              short: 'dollar'
+            }
+          ]
+        }
       }
     },
     methods:{
@@ -269,6 +365,7 @@
           campaignCity: this.campaignCity,
           campaignDistrict: this.campaignDistrict,
           campaignPrice: this.campaignPrice,
+          campaignCurrency: this.campaignCurrency.items[this.campaignCurrency.currentId].short,
           campaignId: this.getCampaignId,
           userId: this.loggedUser.uniqueId,
           campaignCategory: this.campaignCategory,
@@ -374,6 +471,22 @@
       },
       initEventListeners(){
         document.addEventListener("keyup", this.popupListChoose);
+      },
+      changeCampaignCurrency(){
+        let currencies = this.campaignCurrency.items.length;
+
+        (this.campaignCurrency.currentId < currencies-1) ? this.campaignCurrency.currentId ++ : this.campaignCurrency.currentId = 0
+      },
+      initPhoneMask(countryCode){
+        countryCode ? countryCode : countryCode = this.phoneCodes.items[this.phoneCodes.currentCode].code
+
+        let im = new Inputmask(`${countryCode} ( 999 ) 999 - 99 - 99`);
+        im.mask(this.$refs.campaignPhone);
+      },
+      changeCampaignPhoneCode(){
+        this.phoneCodes.currentCode === 0 ? this.phoneCodes.currentCode = 1 : this.phoneCodes.currentCode = 0
+
+        this.initPhoneMask(this.phoneCodes.items[this.phoneCodes.currentCode].code);
       }
     },
     validations:{
@@ -392,6 +505,7 @@
       this.generateCampaignId();
       this.countriesList();
       this.initEventListeners();
+      this.initPhoneMask();
     },
     computed:{
       ...mapGetters(['getCampaignId', 'getCountriesList', 'loggedUser']),
@@ -465,7 +579,13 @@
         }else{
           return false;
         }
-
+      },
+      categoryValidation(){
+        if(this.campaignCategory && this.campaignCategory.length > 0){
+          return true
+        } else{
+          return false
+        }
       }
     },
     watch: {
@@ -531,12 +651,16 @@
   }
   &__body{
     padding: 20px 0;
-    &-slot{
-
-    }
     &-flex-wrap{
       display: flex;
-      flex-direction: column;
+      &.price{
+        padding-bottom: 25px;
+        align-items: center;
+      }
+      &.phone{
+        margin-bottom: 30px;
+        align-items: center;
+      }
     }
     &-input{
       position: relative;
@@ -614,6 +738,27 @@
       }
       &.city{
         padding-bottom: 10px;
+      }
+      &.price{
+        width: 200px;
+        padding-bottom: 0;
+        margin-right: 20px;
+        input{
+          padding: 10px;
+          font-size: 20px;
+          font-weight: 600;
+        }
+      }
+      &.phone{
+        max-width: 400px;
+        margin-right: 20px;
+        padding-bottom: 0;
+        input{
+          padding: 8px 8px 8px 40px;
+        }
+        .create-adv__body-status-icon{
+          top: 9px;
+        }
       }
     }
     &-textarea{
@@ -707,6 +852,107 @@
         &.success-color{
           color: MEDIUMSEAGREEN;
         }
+      }
+    }
+    &-currency{
+      padding-bottom: 0;
+      width: 200px;
+      .currency__stage{
+        position: relative;
+      }
+      .currency__item{
+        padding: 2px 10px;
+        position: relative;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: .2s;
+        z-index: 2;
+        &:hover{
+          background-color: rgba(0,0,0,.2);
+          .currency__description{
+            color: #fff;
+          }
+        }
+        &:hover + .currency__change-btn{
+          display: block;
+        }
+        &:active{
+          background-color: rgba(0,0,0,.25);
+        }
+      }
+      .currency__icon{
+        font-weight: 600;
+        font-size: 20px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .currency__description{
+        margin: 0;
+        font-size: 12px;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        color: #999;
+      }
+      .currency__change-btn{
+        display: none;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        width: 20px;
+        height: 20px;
+        border-top: 1px solid rgba(0,0,0,.3);
+        border-right: 1px solid rgba(0,0,0,.3);
+        transform: translateY(-50%) rotate(45deg);
+        z-index: 1;
+        animation: slideInCurrency .2s;
+      }
+    }
+    &-phone-country{
+      padding-bottom: 0;
+      width: 90px;
+      .phone-country__stage{
+        position: relative;
+      }
+      .phone-country__item{
+        padding: 5px 10px;
+        position: relative;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: .2s;
+        z-index: 2;
+        &:hover{
+          background-color: rgba(0,0,0,.2);
+        }
+        &:hover + .phone-country__change-btn{
+          display: block;
+        }
+        &:active{
+          background-color: rgba(0,0,0,.25);
+        }
+      }
+      .phone-country__flag{
+        width: 35px;
+        height: 25px;
+        border-radius: 5px;
+        background-position: center;
+        background-size: cover;
+      }
+      .phone-country__change-btn{
+        display: none;
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        width: 10px;
+        height: 10px;
+        border-top: 1px solid rgba(0,0,0,.3);
+        border-right: 1px solid rgba(0,0,0,.3);
+        transform: translateY(-50%) rotate(45deg);
+        z-index: 1;
+        animation: slideInCurrency .2s;
       }
     }
   }
@@ -804,6 +1050,33 @@
     margin-top: 0;
     font-size: 12px;
   }
+  .v-select{
+    margin-bottom: 25px;
+    &.validation-success .vs__dropdown-toggle{
+      border: 1px solid MEDIUMSEAGREEN!important;
+    }
+    .vs__dropdown-toggle{
+      border: 1px solid #eee;
+      border-radius: 4px;
+      box-shadow: inset 0px 0px 5px rgba(0, 0, 0, 0.1);
+      outline: none;
+      transition: .2s;
+    }
+    .vs__search{
+      &::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+        color: #e0e0e0;
+      }
+      &::-moz-placeholder { /* Firefox 19+ */
+        color: #e0e0e0;
+      }
+      &:-ms-input-placeholder { /* IE 10+ */
+        color: #e0e0e0;
+      }
+      &:-moz-placeholder { /* Firefox 18- */
+        color: #e0e0e0;
+      }
+    }
+  }
 }
 
 @keyframes slidein {
@@ -841,6 +1114,18 @@
 
     100% {
       transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInCurrency {
+    0% {
+      opacity: 0;
+      transform: translate(-15px, -55%) rotate(45deg);
+    }
+
+    100% {
+      opacity: 1;
+      transform: translateY(-50%) rotate(45deg);
     }
   }
 </style>
